@@ -1,4 +1,4 @@
-use polywrap_wasm_rs::{BigInt};
+use polywrap_wasm_rs::{BigInt, wrap_debug_log};
 use std::collections::BTreeMap;
 
 use crate::{
@@ -23,7 +23,7 @@ use crate::{
     MetaTransactionOptions, RelayerModule, SafeContractsModule, SafeContractsSafeTransaction,
     SafeContractsSafeTransactionData, SafeContractsSignSignature, SafeFactoryModule,
     SafeManagerModule, SafeManagerSafeTransaction, SafeManagerSafeTransactionData,
-    SafeManagerSignSignature,
+    SafeManagerSignSignature, wrap,
 };
 
 pub const ZERO_ADDRESS: &str = "0x0000000000000000000000000000000000000000";
@@ -57,12 +57,16 @@ impl AccountAbstraction for Safe {
         data: MetaTransactionData,
         options: MetaTransactionOptions,
     ) -> String {
+
+        wrap_debug_log("calling relay transaction :)");
         let standardized_tx = self.standardize_transaction_data(data, options.clone());
+        wrap_debug_log("transaction standardized");
         // get signature from signer of the sanitized transaction data
         let manager_connection = safe_manager_ethereum_connection::SafeManagerEthereumConnection {
             node: self.connection.clone().node,
             network_name_or_chain_id: self.connection.clone().network_name_or_chain_id,
         };
+        wrap_debug_log("before gettinig signature");
         let transaction = SafeManagerModule::get_signature(&ArgsGetSignature {
             tx: standardized_tx.into(),
             signing_method: None,
@@ -70,6 +74,8 @@ impl AccountAbstraction for Safe {
             connection: manager_connection.clone(),
         })
         .unwrap();
+
+        wrap_debug_log("after getting signature");
 
         // encode the sanitized transaction w/signature
         let transaction_data =
@@ -139,15 +145,18 @@ impl Safe {
             network_name_or_chain_id: connection.clone().network_name_or_chain_id,
         };
 
+        wrap_debug_log("before chain id");
         let chain_id = EtherCoreModule::get_chain_id(&ArgsGetChainId {
             connection: Some(connection.clone()),
         })
         .unwrap();
 
+        wrap_debug_log("chain id fetched");
         let signer = EtherCoreModule::get_signer_address(&ArgsGetSignerAddress {
             connection: Some(connection.clone()),
         })
         .unwrap();
+    wrap_debug_log("signer fetched");
 
         let mut custom_contract_addresses = None;
         let mut factory_address = String::new();
@@ -179,9 +188,14 @@ impl Safe {
             }),
         };
 
+
+        wrap_debug_log("before getting safe contract");
         let safe_contracts_networks =
             SafeContractsModule::get_safe_contract_networks(&get_safe_contract_network_args)
                 .unwrap();
+
+
+                wrap_debug_log("after getting safe contract");
 
         if factory_address.is_empty() {
             if let Some(address) = safe_contracts_networks.safe_proxy_factory_address {
@@ -219,8 +233,11 @@ impl Safe {
         let predict_address_args = ArgsPredictSafeAddress {
             input: deployment_info.clone(),
         };
+
+        wrap_debug_log("before predicting safe address");
         let address = SafeFactoryModule::predict_safe_address(&predict_address_args).unwrap();
 
+        wrap_debug_log("after predicting safe address");
         Safe {
             chain_id: chain_id.parse::<i32>().unwrap(),
             signer: signer.as_str().to_string(),
