@@ -1,8 +1,13 @@
 import { MetaTransactionOptions } from "../../common/schema.graphql"
 import { Module } into GelatoRelayer from "wrap://ens/gelato.wraps.eth:relayer@0.0.1"
 
+type Connection {
+    networkNameOrChainId: String
+}
+
 type Env {
     relayerApiKey: String!
+    connection: Connection
 }
 
 type Module {

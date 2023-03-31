@@ -1,4 +1,4 @@
-use polywrap_wasm_rs::BigInt;
+use polywrap_wasm_rs::{BigInt, wrap_debug_log};
 
 use crate::{
     imported::{
@@ -15,6 +15,7 @@ const GELATO_NATIVE_TOKEN_ADDRESS: &str = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeee
 const GELATO_FEE_COLLECTOR: &str = "0x3AC05161b76a35c1c28dC99Aa01BEd7B24cEA3bf";
 const GELATO_RELAY_URL: &str = "https://relay.gelato.digital";
 const ZERO_ADDRESS: &str = "0x0000000000000000000000000000000000000000";
+const DEFAULT_RELAYER_API_KEY: &str = "AiaCshYRyAUzTNfZZb8LftJaAl2SS3I8YwhJJXc5J7A_";
 
 pub trait RelayAdapter {
     fn get_fee_collector() -> String;
@@ -42,9 +43,12 @@ impl RelayAdapter for GelatoRelayer {
     }
 
     fn relay_transaction(transaction: RelayTransaction, env: Option<Env>) -> RelayResponse {
+        // let mut default_key = DEFAULT_RELAYER_API_KEY;
         let is_sponsored = if let Some(is_sponsored) = transaction.options.is_sponsored {
             if env.is_none() {
                 panic!("Sponsor API Key not defined")
+                // env.unwrap().relayer_api_key;
+                // wrap_debug_log("Sponsor A/PI Key not defined, the default will be used")
             };
 
             is_sponsored
@@ -57,7 +61,7 @@ impl RelayAdapter for GelatoRelayer {
                 transaction.target,
                 transaction.encoded_transaction,
                 transaction.chain_id,
-                env.unwrap().relayer_api_key,
+                env.unwrap().relayer_api_key
             )
         } else {
             GelatoRelayer::pay_transaction(
