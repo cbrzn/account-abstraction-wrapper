@@ -12,21 +12,25 @@ import { Wallet } from "ethers";
 config();
 
 export function configure(builder: IClientConfigBuilder): IClientConfigBuilder {
-  if (!process.env.PRIVATE_KEY) {
-    throw new Error(
-      "You must define a private key in the .env file. See .example.env"
-    );
-  }
+  // Jest sets NODE_ENV to "test" when running tests
+  const isTestEnv = process.env.NODE_ENV === "test";
 
-  if (!process.env.RPC_URL) {
-    throw new Error(
-      "You must define a RPC URL in the .env file. See .example.env"
-    );
-  }
+  builder.addDefaults();
 
-  return (
+  if (isTestEnv) {
+    if (!process.env.PRIVATE_KEY) {
+      throw new Error(
+        "You must define a private key in the .env file. See .example.env"
+      );
+    }
+
+    if (!process.env.RPC_URL) {
+      throw new Error(
+        "You must define a RPC URL in the .env file. See .example.env"
+      );
+    }
+
     builder
-      .addDefaults()
       .addPackages({
         "wrap://ens/wraps.eth:ethereum-provider@2.0.0": ethereumProviderPlugin({
           connections: new Connections({
@@ -36,7 +40,7 @@ export function configure(builder: IClientConfigBuilder): IClientConfigBuilder {
                 signer: new Wallet(process.env.PRIVATE_KEY as string),
               }),
             },
-            defaultNetwork: "goerli"
+            defaultNetwork: "goerli",
           }),
         }),
         "wrap://ens/datetime.polywrap.eth": dateTimePlugin({}) as IWrapPackage,
@@ -45,14 +49,18 @@ export function configure(builder: IClientConfigBuilder): IClientConfigBuilder {
         connection: {
           networkNameOrChainId: "goerli",
         },
-      })
-      .addRedirect(
-        "wrap://ens/aa.wraps.eth:relayer-adapter@0.0.1",
-        "wrap://fs/../relay/build"
-      )
-      .addRedirect(
-        "wrap://ens/gelato.wraps.eth:relayer@0.0.1",
-        "wrap://fs/../../../../polywrap/gelato-relay-polywrap/build"
-      )
-  );
+      });
+  }
+
+  builder
+    .addRedirect(
+      "wrap://ens/aa.wraps.eth:relayer-adapter@0.0.1",
+      "wrap://fs/../relay/build"
+    )
+    .addRedirect(
+      "wrap://ens/gelato.wraps.eth:relayer@0.0.1",
+      "wrap://fs/../../../../polywrap/gelato-relay-polywrap/build"
+    );
+
+  return builder;
 }
