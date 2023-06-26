@@ -1,0 +1,5 @@
+format: 0.1.0
+description: Safe Relay Wrap
+website: https://polywrap.io
+repository: https://github.com/cbrzn/account-abstraction-wrapper
+readme: ./README.md

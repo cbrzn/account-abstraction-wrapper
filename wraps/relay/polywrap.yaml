@@ -1,7 +1,9 @@
-format: 0.3.0
+format: 0.4.0
 project:
   name: relayer-wasm-rs
   type: wasm/rust
 source:
   module: ./Cargo.toml
   schema: ./src/schema.graphql
+extensions:
+  docs: ./polywrap.docs.yaml
