@@ -6,7 +6,7 @@ As with any wrap, you can use the Safe AA Wrap within any environment where you 
 
 ## Configuration
 
-The AA Wrap requires you to set your wallet's private key and the Ethereum RPC URL in order to be able to deploy your Safe contract and call its functions.
+The AA Wrap allows you to pass a signer (through browser or with private key) in order to be able to deploy your Safe contract and call its functions.
 
 You will need to add the [ethereum provider plugin](https://github.com/polywrap/ethereum-wallet) to the Polywrap Client's config manually.
 You will also need to add the [datetime plugin](https://github.com/polywrap/datetime).
@@ -98,10 +98,11 @@ const encodeResult = await client.invoke({
 });
 ```
 
-The Account Abstraction Wrapper's `relayTransaction` method allows you to make a gasless transaction by performing the following steps:
+The Account Abstraction Wrapper's `relayTransaction` method allows you to make a transaction by performing the following steps:
+
 1. It checks whether there's a deployed Safe contract on your predicted address.
 2. It deploys a Safe contract to the predicted address if there isn't one.
-3. It executes the gasless (sponsored) transaction using the Gelato Relay.
+3. It executes the transaction using the Gelato Relay.
 
 ```javascript
 await client.invoke({
@@ -116,10 +117,11 @@ await client.invoke({
     },
     options: {
       gasLimit: "300000",
-      isSponsored: true
+      isSponsored: true // Determines whether this should be a sponsored (gasless) transaction or not
     },
     config: {
       // Replace this with your own salt nonce. This is used to deploy your safe contract if there is none.
+      // This is not required. If not supplied, the current date/time will be used to generate a salt nonce.
       saltNonce: "0x258802387238728372837283771"
     }
   }
