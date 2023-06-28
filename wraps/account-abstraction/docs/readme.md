@@ -2,11 +2,12 @@
 
 The Safe AA Wrap is an implementation of the [Safe{Core} Account Abstraction SDK](https://docs.safe.global/learn/safe-core/safe-core-account-abstraction-sdk) in the form of a Polywrap wrap.
 
-As with any wrap, you can use the Safe AA Wrap within any environment where you can use the [Polywrap Client](https://docs.polywrap.io/clients).
+## Requirements
 
+To run the Safe AA wrap you'll need a Polywrap client in your application. See here for installation information: https://docs.polywrap.io/clients
 ## Configuration
 
-The AA Wrap allows you to pass a signer (through browser or with private key) in order to be able to deploy your Safe contract and call its functions.
+The Safe AA Wrap allows you to pass a signer (through browser or with private key) in order to be able to deploy your Safe contract and call its functions.
 
 You will need to add the [ethereum provider plugin](https://github.com/polywrap/ethereum-wallet) to the Polywrap Client's config manually.
 You will also need to add the [datetime plugin](https://github.com/polywrap/datetime).
@@ -22,7 +23,6 @@ import {
 import { dateTimePlugin } from "@polywrap/datetime-plugin-js";
 import { PolywrapClient, ClientConfigBuilder } from "@polywrap/client-js";
 
-
 const builder = new ClientConfigBuilder();
 
 builder
@@ -32,9 +32,12 @@ builder
     "wrap://ens/wraps.eth:ethereum-provider@2.0.0": ethereumProviderPlugin({
       connections: new Connections({
         networks: {
-          goerli: new Connection({
+          goerli: new Connection({        
             provider: "RPC_URL", // Add your RPC URL here
             signer: new Wallet("PRIVATE_KEY"), // Add your private key here
+            
+            // Alternatively, instead of setting provider and signer, you can simply use window.ethereum as your provider:
+            // provider: window.ethereum
           }),
         },
         defaultNetwork: "goerli",
@@ -43,7 +46,7 @@ builder
     // This adds the datetime plugin
     "wrap://ens/datetime.polywrap.eth": dateTimePlugin({}) as IWrapPackage,
   })
-  // This URL should be replaced with the URL of the AA Wrap
+  // This URL should be replaced with the Wrap URL of the AA Wrap
   .addEnv("wrap://wrapper/account-abstraction", {
     connection: {
       networkNameOrChainId: "goerli", // Determines which network you're using
@@ -57,10 +60,16 @@ const config = builder.build();
 const client = new PolywrapClient(config);
 
 const invocationResult = client.invoke({
+  // This URI should be replaced with the Wrap URI of the AA Wrap
   uri: "wrap://wrapper/account-abstraction",
   args: { ... }
 })
 ```
+
+## Run!
+
+With your client successfully configured, you can now run any function on the UniV3 wrap with ease.
+See the examples below, or [take a look at the Safe AA wrap tests](https://github.com/cbrzn/account-abstraction-wrapper/tree/main/wraps/account-abstraction/src/__tests__) for invocation examples.
 
 ## Examples
 
@@ -70,7 +79,8 @@ Since your Safe address is deterministic based on your wallet's address and a no
 
 ```javascript
 const addressResult = await client.invoke({
-  uri: "wrap://ens/aa.safe.wraps.eth:core@0.1.0",
+  // This URI should be replaced with the Wrap URI of the AA Wrap
+  uri: "wrap://wrapper/account-abstraction",
   method: "getSafeAddress",
   args: {
     config: {
@@ -106,7 +116,8 @@ The Account Abstraction Wrapper's `relayTransaction` method allows you to make a
 
 ```javascript
 await client.invoke({
-  uri: "wrap://ens/aa.safe.wraps.eth:core@0.1.0",
+  // This URI should be replaced with the Wrap URI of the AA Wrap
+  uri: "wrap://wrapper/account-abstraction",
   method: "relayTransaction",
   args: {
     transaction: {
@@ -127,3 +138,7 @@ await client.invoke({
   }
 });
 ```
+
+## Support
+
+For any questions or problems related to the Safe AA wrap or Polywrap at large, please visit our [Discord](https://discord.polywrap.io).
