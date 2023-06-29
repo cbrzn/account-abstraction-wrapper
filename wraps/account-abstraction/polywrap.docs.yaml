@@ -2,4 +2,4 @@ format: 0.1.0
 description: Add safe account abstraction into any application
 website: https://polywrap.io
 repository: https://github.com/cbrzn/account-abstraction-wrapper
-readme: ./docs/readme.md
+readme: ./readme.md
