@@ -4,7 +4,7 @@ The Safe AA Wrap is an implementation of the [Safe{Core} Account Abstraction SDK
 
 ## Requirements
 
-To run the Safe AA wrap you'll need a Polywrap client in your application. See here for installation information: https://docs.polywrap.io/clients
+To run the Safe AA wrap you'll need a Polywrap client in your application. See here for installation information: [https://docs.polywrap.io/clients](https://docs.polywrap.io/clients)
 ## Configuration
 
 The Safe AA Wrap allows you to pass a signer (through browser or with private key) in order to be able to deploy your Safe contract and call its functions.
